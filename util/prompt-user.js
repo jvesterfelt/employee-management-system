@@ -2,9 +2,92 @@ const inquirer = require('inquirer');
 const Employee = require('../lib/Employee');
 const Department = require('../lib/Department');
 const Role = require('../lib/Role');
+const db = require('../config/connection');
 
-const promptUser = function() {
-    inquirer.prompt({
+const viewRoles = () => {
+    const sql = 'SELECT * FROM roles';
+    db.query(sql, [], function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.table(results);
+        promptUser();
+    });
+};
+
+
+const addRole = (response) => {
+    const sql = 'INSERT INTO roles ("id", "title", "salary", "department_id") VALUES (?, ?, ?, ?)';
+
+    db.query(sql, [], function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.table('Results: ', results);
+        promptUser();
+    })
+};
+
+const viewEmployees = () => {
+    const sql = 'SELECT * FROM employees '
+    db.query(sql, [], function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.table('Results: ', results);
+        promptUser();
+    })
+};
+
+const addEmployee = () => {
+    const sql = 'INSERT INTO employees VALUES (?, ?, ?, ?)';
+    db.query(sql, [], function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.table('Results: ', results);
+        promptUser();
+    })
+};
+
+const updateEmployee = () => {
+    const sql = 'UPDATE employees SET role_id = (?) WHERE id = (?)';
+
+    db.query(sql, [], function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.table('Results: ', results);
+        promptUser();
+    })
+};
+
+const viewDepartments = () => {
+    const sql = 'SELECT * FROM departments';
+
+    db.query(sql, [], function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.table('Results: ', results);
+        promptUser();
+    })
+};
+
+const addDepartment = () => {
+    const sql = 'INSERT INTO departments VALUES (?, ?)'
+
+    db.query(sql, [], function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.table('Results: ', results);
+        promptUser();
+    })
+};
+
+const promptUser = async function() {
+    await inquirer.prompt({
             type: 'list',
             name: 'begin',
             message: 'What would you like to do?',
@@ -13,25 +96,32 @@ const promptUser = function() {
         .then(action => {
             switch (action.begin) {
                 case 'View all departments':
-                    Department.viewAllDepartmens();
+                    console.log('view departments');
+                    viewDepartments();
                     break;
                 case 'View all roles':
-                    Role.viewAllRoles();
+                    console.log('view roles');
+                    viewRoles();
                     break;
                 case 'View all employees':
-                    Employee.viewAllEmployees();
+                    console.log('view employees');
+                    viewEmployees();
                     break;
                 case 'Add a department':
-                    Department.addDepartment();
+                    console.log('add department');
+                    addDepartment();
                     break;
                 case 'Add a role':
-                    Role.addRole();
+                    console.log('add role');
+                    addRole();
                     break;
                 case 'Add an employee':
-                    Employee.addEmployee();
+                    console.log('add employee');
+                    addEmployee();
                     break;
                 case 'Update an employee role':
-                    Employee.updateEmployee();
+                    console.log('update employee role');
+                    updateEmployee();
                     break;
                 default:
                     console.log('Error: Application failed.');
