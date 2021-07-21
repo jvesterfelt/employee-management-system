@@ -18,9 +18,9 @@ Make sure that you have a mysql database on the server you're installing. Downlo
 This application is solely for educational purposes.
     
 #### Usage Screenshots:
+![image](https://user-images.githubusercontent.com/81572838/126560045-62bf8a58-5682-45ee-91a0-7eced075c4be.png)
 
-    
-
+#### Video Walkthrough:
     
 ## Contributing
 Before contributing to this project please review the Contributor Covenant Code of Conduct:
