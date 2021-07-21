@@ -21,6 +21,7 @@ This application is solely for educational purposes.
 ![image](https://user-images.githubusercontent.com/81572838/126560045-62bf8a58-5682-45ee-91a0-7eced075c4be.png)
 
 #### Video Walkthrough:
+https://youtu.be/vzHVJy45ITc
     
 ## Contributing
 Before contributing to this project please review the Contributor Covenant Code of Conduct:
