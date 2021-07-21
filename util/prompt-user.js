@@ -141,7 +141,7 @@ const addEmployee = () => {
     
 };
 
-const updateEmployee = () => {
+const updateEmployeeRole = () => {
     const sql = 'UPDATE employees SET role_id = (?) WHERE id = (?);';
     const params = [];
 
@@ -150,6 +150,46 @@ const updateEmployee = () => {
             type: 'input',
             name: 'role_id',
             message: "Please enter the employee's new role ID",
+            validate: roleIdData => {
+                if (!roleIdData) {
+                    console.log('You must enter the new role ID');
+                    return false;
+                }
+                return true;
+            }
+        }, {
+            type: 'input',
+            name: 'employee_id',
+            message: "Please enter the employee's ID.",
+            validate: empIdData => {
+                if (!empIdData) {
+                    console.log('You must enter the employee ID');
+                    return false;
+                }
+                return true;
+            }
+        }])
+        .then(result => {
+            params.push(result.employee_id, result.role_id)
+            db.query(sql, params, function(err, results) {
+                if (err) {
+                    console.log('Error running query.', err);
+                }
+                console.log('Results: ', results);
+                promptUser();
+            })
+        })
+};
+
+const updateEmployeeManager = () => {
+    const sql = 'UPDATE employees SET manager_id = (?) WHERE id = (?);';
+    const params = [];
+
+    inquirer
+        .prompt([{
+            type: 'input',
+            name: 'role_id',
+            message: "Please enter the employee's new manager ID",
             validate: roleIdData => {
                 if (!roleIdData) {
                     console.log('You must enter the new role ID');
@@ -223,12 +263,191 @@ const addDepartment = () => {
         });
 };
 
+const viewEmployeesByManager = () => {
+    const sql = 'SELECT * FROM employees WHERE manager_id = (?);';
+    const params = [];
+
+inquirer.prompt([{
+    type: 'input',
+    name: 'manager_id',
+    message: 'Please enter the ID of the employee manager',
+    validate: response => {
+        if (!response) {
+            console.log('You must enter the manager ID');
+            return false;
+        }
+        return true;
+    }
+}]).then(dbViewData => {
+        params.push(dbViewData.manager_id);
+        db.query(sql, params, function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.table(results);
+        promptUser();
+    });
+    })
+};
+
+const viewEmployeesByDepartment = () => {
+    const sql = 'SELECT * FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN departments ON roles.department_id = departments.id WHERE departments.id = (?);';
+    const params = [];
+
+    inquirer.prompt([{
+    type: 'input',
+    name: 'department_id',
+    message: 'Please enter the department ID to view',
+    validate: response => {
+        if (!response) {
+            console.log('You must enter the department ID');
+            return false;
+        }
+        return true;
+    }
+}]).then(dbViewData => {
+        params.push(dbViewData.department_id);
+        db.query(sql, params, function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.table(results);
+        promptUser();
+    });
+    });
+};
+
+const deleteDepartment = () => {
+    const sql = 'DELETE FROM departments WHERE id = (?)';
+    const params = [];
+
+inquirer.prompt([{
+    type: 'input',
+    name: 'department_id',
+    message: 'Enter the department ID you wish to delete',
+    validate: response => {
+        if (!response) {
+            console.log('You must enter the department ID');
+            return false;
+        }
+        return true;
+    }
+}]).then(dbViewData => {
+        params.push(dbViewData.department_id);
+        db.query(sql, params, function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.log(results);
+        promptUser();
+    });
+    });
+};
+
+const deleteRole = () => {
+   const sql = 'DELETE FROM roles WHERE id = (?)';
+    const params = [];
+
+inquirer.prompt([{
+    type: 'input',
+    name: 'role_id',
+    message: 'Enter the role ID you wish to delete',
+    validate: response => {
+        if (!response) {
+            console.log('You must enter the role ID');
+            return false;
+        }
+        return true;
+    }
+}]).then(dbViewData => {
+        params.push(dbViewData.role_id);
+        db.query(sql, params, function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.log(results);
+        promptUser();
+    });
+    });
+};
+
+const deleteEmployee = () => {
+    const sql = 'DELETE FROM employees WHERE id = (?)';
+    const params = [];
+
+inquirer.prompt([{
+    type: 'input',
+    name: 'employee_id',
+    message: 'Enter the employee ID you wish to delete',
+    validate: response => {
+        if (!response) {
+            console.log('You must enter the employee ID');
+            return false;
+        }
+        return true;
+    }
+}]).then(dbViewData => {
+        params.push(dbViewData.employee_id);
+        db.query(sql, params, function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.table(results);
+        promptUser();
+    });
+    });
+};
+
+const totalDepartmentBudget = () => {
+    const sql = 'SELECT SUM(salary) FROM employees LEFT JOIN roles ON roles.id = employees.role_id LEFT JOIN departments ON roles.id = departments.id WHERE departments.id = (?);';
+    const params = [];
+
+    inquirer.prompt([{
+        type: 'input',
+        name: 'department_id',
+        message: 'Please enter the department ID for the budget utilization you would like to see',
+        validate: response => {
+            if (!response) {
+                console.log('Please enter the department ID');
+                return false;
+            }
+            return true;
+        }
+    }]).then(dbViewData => {
+        params.push(dbViewData.department_id);
+        db.query(sql, params, function(err, results) {
+        if (err) {
+            console.log('Error running query.', err);
+        }
+        console.table(results);
+        promptUser();
+    });
+    })
+};
+
+
+
 const promptUser = async function() {
     await inquirer.prompt({
             type: 'list',
             name: 'begin',
             message: 'What would you like to do?',
-            choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Quit']
+            choices: [
+            'View all departments', 
+            'View all roles', 
+            'View all employees', 
+            'Add a department', 
+            'Add a role', 
+            'Add an employee', 
+            "Update an employee role", 
+            "Update an employee's manager",
+            'View employees by manager',
+            'View employees by department',
+            'Delete department',
+            'Delete role',
+            'Delete employee',
+            'View total department budget',
+            'Quit']
         })
         .then(action => {
             switch (action.begin) {
@@ -258,7 +477,35 @@ const promptUser = async function() {
                     break;
                 case 'Update an employee role':
                     console.log('update employee role');
-                    updateEmployee();
+                    updateEmployeeRole();
+                    break;
+                case "Update an employee's manager":
+                    console.log('update employee manager');
+                    updateEmployeeManager();
+                    break;
+                case 'View employees by manager':
+                    console.log('View employees by manager');
+                    viewEmployeesByManager();
+                    break;
+                case 'View employees by department':
+                    console.log('View employees by department');
+                    viewEmployeesByDepartment();
+                    break;
+                case 'Delete department':
+                    console.log('Delete department');
+                    deleteDepartment();
+                    break;
+                case 'Delete role':
+                    console.log('Delete role');
+                    deleteRole();
+                    break;
+                case 'Delete employee':
+                    console.log('Delete employee');
+                    deleteEmployee();
+                    break;
+                case 'View total department budget':
+                    console.log('View total department budget');
+                    totalDepartmentBudget();
                     break;
                 case 'Quit':
                     process.exit();
